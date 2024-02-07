@@ -27,7 +27,15 @@ WARNINGS = -Wall -Wpointer-arith -Wcast-qual -Wnested-externs -Wsign-compare \
 CFLAGS = -g -Os $(SHAREDLIB_CFLAGS) -Werror $(WARNINGS) $(EXTRA_CFLAGS)
 
 BISON = bison
+ifeq (, $(shell which $(BISON)))
+$(error "No $(BISON) in path.")
+endif
+
 LEX = flex
+ifeq (, $(shell which $(LEX)))
+$(error "No $(LEX) in path.")
+endif
+
 SWIG = swig
 PKG_CONFIG ?= pkg-config
 PYTHON ?= python3
