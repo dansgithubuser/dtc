@@ -9,9 +9,13 @@
 #include <libfdt_env.h>
 #include <fdt.h>
 
+#include <stdio.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define trace(...) { printf("%s:%d %s    ", __FILE__, __LINE__, __func__); printf(__VA_ARGS__); printf("\n"); }
 
 #define FDT_FIRST_SUPPORTED_VERSION	0x02
 #define FDT_LAST_COMPATIBLE_VERSION 0x10

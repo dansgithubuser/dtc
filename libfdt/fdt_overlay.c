@@ -362,17 +362,23 @@ static int overlay_fixup_one_phandle(void *fdt, void *fdto,
 	int symbol_off, fixup_off;
 	int prop_len;
 
+	trace("path: %s  name: %s  label: %s", path, name, label);
+
 	if (symbols_off < 0)
 		return symbols_off;
 
 	symbol_path = fdt_getprop(fdt, symbols_off, label,
 				  &prop_len);
-	if (!symbol_path)
+	if (!symbol_path) {
+		trace("couldn't get property %s", label);
 		return prop_len;
+	}
+	trace("symbol path: %s", symbol_path);
 
 	symbol_off = fdt_path_offset(fdt, symbol_path);
 	if (symbol_off < 0)
 		return symbol_off;
+	trace("offset: %d", symbol_off);
 
 	phandle = fdt_get_phandle(fdt, symbol_off);
 	if (!phandle)
@@ -820,26 +826,32 @@ int fdt_overlay_apply(void *fdt, void *fdto)
 	FDT_RO_PROBE(fdt);
 	FDT_RO_PROBE(fdto);
 
+	trace("find max phandle");
 	ret = fdt_find_max_phandle(fdt, &delta);
 	if (ret)
 		goto err;
 
+	trace("adjust local phandles");
 	ret = overlay_adjust_local_phandles(fdto, delta);
 	if (ret)
 		goto err;
 
+	trace("update local references");
 	ret = overlay_update_local_references(fdto, delta);
 	if (ret)
 		goto err;
 
+	trace("fixup phandles");
 	ret = overlay_fixup_phandles(fdt, fdto);
 	if (ret)
 		goto err;
 
+	trace("merge");
 	ret = overlay_merge(fdt, fdto);
 	if (ret)
 		goto err;
 
+	trace("symbol update");
 	ret = overlay_symbol_update(fdt, fdto);
 	if (ret)
 		goto err;

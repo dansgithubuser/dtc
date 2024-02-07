@@ -134,6 +134,7 @@ static int do_fdtoverlay(const char *input_filename,
 
 	/* apply the overlays in sequence */
 	for (i = 0; i < argc; i++) {
+		trace("applying %s", argv[i]);
 		blob = apply_one(blob, ovblob[i], &buf_len, argv[i]);
 		if (!blob)
 			goto out_err;
