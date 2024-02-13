@@ -564,6 +564,7 @@ static int overlay_apply_node(void *fdt, int target,
 		if (prop_len < 0)
 			return prop_len;
 
+		trace("set prop %s", name);
 		ret = fdt_setprop(fdt, target, name, prop, prop_len);
 		if (ret)
 			return ret;
@@ -574,6 +575,7 @@ static int overlay_apply_node(void *fdt, int target,
 		int nnode;
 		int ret;
 
+		trace("apply subnode %s", name);
 		nnode = fdt_add_subnode(fdt, target, name);
 		if (nnode == -FDT_ERR_EXISTS) {
 			nnode = fdt_subnode_offset(fdt, target, name);
@@ -612,6 +614,9 @@ static int overlay_merge(void *fdt, void *fdto)
 	int fragment;
 
 	fdt_for_each_subnode(fragment, fdto, 0) {
+		const char *name = fdt_get_name(fdto, fragment, NULL);
+		trace("merge %s", name);
+
 		int overlay;
 		int target;
 		int ret;
@@ -621,8 +626,10 @@ static int overlay_merge(void *fdt, void *fdto)
 		 * they don't, it's not supposed to be merged
 		 */
 		overlay = fdt_subnode_offset(fdto, fragment, "__overlay__");
-		if (overlay == -FDT_ERR_NOTFOUND)
+		if (overlay == -FDT_ERR_NOTFOUND) {
+			trace("not supposed to be merged? fragment doesn't have __overlay__ node");
 			continue;
+		}
 
 		if (overlay < 0)
 			return overlay;
